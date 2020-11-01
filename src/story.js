@@ -171,14 +171,16 @@ export class Story {
    * @param {}
    */
   static updateGameState({ gameState, now, locMap, collisions, timeSinceLast }) {
-    let { player, areas, conversation, inventory, mail, characters, events } = gameState;
+    let { player, areas, conversation, inventory, mail, characters, events, conversationTriggered } = gameState;
     let expired = [];
+
+    // console.log(gameState);
 
     for (let i = 0; i < events.length; i++) {
 
-      if (!Story.isTriggered({ areas, player, characters, trigger: events[i].trigger, now, timeSinceLast })) {
-        continue; 
-      }
+      // if (!Story.isTriggered({ areas, player, characters, trigger: events[i].trigger, now, timeSinceLast })) {
+      //   continue;
+      // }
 
       const selector = events[i].selector && Story.createSelector(events[i].selector);
       switch(events[i].type) {
@@ -187,7 +189,8 @@ export class Story {
           characters = Story.setDestination({ characters, selector, destination: events[i].destination });
           break;
         case 'start-conversation':
-          conversation = Story.startConversation({ characters, selector })
+          // conversation = Story.startConversation({ characters, selector })
+          conversation = Story.conversationTriggered(gameState, player, characters, events, conversationTriggered);
           break;
       }
       // Tag expired events for removal
@@ -197,6 +200,8 @@ export class Story {
     }
     // Update Events
     events = events.filter(t => !expired.includes(t));
+
+    // console.log(gameState);
 
     return {
       ...gameState,
@@ -211,7 +216,7 @@ export class Story {
    * @param {}
    */
   static startConversation({ characters, selector }) {
-    const character = characters.find(selector); 
+    const character = characters.find(selector);
     return { 
       character,
       currentDialog: character.dialog,
@@ -261,5 +266,36 @@ export class Story {
    */
   static newId(collection) {
     return collection.reduce((a,b) => Math.max(a,b.id), -1)+1;
+  }
+
+  /**
+   * to detect if conversation is triggered
+   *
+   * @param gameState
+   * @param player
+   * @param characters
+   * @param events
+   * @param conversationTriggered
+   * @returns {boolean|{conversationTriggered: boolean, character: *, currentDialog: *, selectedOption: number}}
+   */
+  static conversationTriggered(gameState, player, characters, events, conversationTriggered){
+    for (let i = 0; i < characters.length; i++){
+      if (characters[i].type === 'vip' && Story.isWithinDistance({ distance: events[2].trigger.distance, a: player, b: characters[i] })){
+        let character = characters[i];
+        conversationTriggered = true;
+        let x = characters[i].x;
+        let y = characters[i].y;
+        gameState.characters[i].destination = {x: x, y: y};
+
+        return {
+          character,
+          currentDialog: characters[i].dialog,
+          selectedOption: 0,
+          conversationTriggered
+        };
+      }
+    }
+    conversationTriggered = false;
+    return conversationTriggered;
   }
 }

@@ -61,7 +61,7 @@ window.addEventListener('load', async () => {
   }, canvasProvider);
 
   // Add some random characters
-  let newCharacters = new Array(4).fill(gameState.characters[0]).map((t, i) => {
+  let newCharacters = new Array(0).fill(gameState.characters[0]).map((t, i) => {
     let spriteIndex = 8;
     while(spriteIndex === 8) { spriteIndex = Math.floor(Math.random()*13); }
     return { ...t, id:i+gameState.characters.length+1, spriteIndex, type:'' }; //other NPCs' IDs follow the 'vip' NPCs'
@@ -129,10 +129,12 @@ window.addEventListener('load', async () => {
       characters: physicsState.characters,
     };
     const now = new Date() - start;
+    let conversationTriggered = false;
     let newGameState = Story.updateGameState({ 
       gameState, 
       now,
       timeSinceLast,
+      conversationTriggered
     });
     last = new Date();
     if (newGameState !== gameState) {
@@ -349,6 +351,10 @@ function renderConversation(conversation) {
     ${currentDialog.response}
   </p>`;
   el.innerHTML = html;
+
+  if (!conversation.conversationTriggered) {
+    el.style.display = 'none';
+  }
 }
 
 /**

@@ -41,7 +41,6 @@ export class Characters {
       else if (xmove > 0) { facing = prefix + 'right'; }
       else if (prefix) { facing = prefix; }
 
-      // console.log(width + ": " + height);
       if (newNPC.type === 'vip' && !attack && (
           newNPC.x >= width*newNPC.maxRight ||
           newNPC.y <= width*newNPC.maxLeft ||
