@@ -280,20 +280,19 @@ export class Story {
    */
   static conversationTriggered(gameState, player, characters, events, conversationTriggered){
     for (let i = 0; i < characters.length; i++){
-      if (characters[i].type === 'vip' && Story.isWithinDistance({ distance: events[2].trigger.distance, a: player, b: characters[i] })){
-        let character = characters[i];
+      let character = characters[i];
+      if (character.type === 'vip' && Story.isWithinDistance({ distance: events[2].trigger.distance, a: player, b: character })){
+        character.speed = 0; // when triggered, stop moving
         conversationTriggered = true;
-        let x = characters[i].x;
-        let y = characters[i].y;
-        gameState.characters[i].destination = {x: x, y: y};
 
         return {
           character,
-          currentDialog: characters[i].dialog,
+          currentDialog: character.dialog,
           selectedOption: 0,
           conversationTriggered
         };
       }
+      character.speed = 1; //TODO need to be not hardcode
     }
     conversationTriggered = false;
     return conversationTriggered;

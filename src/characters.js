@@ -16,7 +16,7 @@ export class Characters {
 
     // Allow for spawn points
     if (npc.isNew && npc.fallbackSpeed == null) {
-      newNPC = { ...newNPC, speed: npc.width+1, fallbackSpeed: npc.speed };
+      newNPC = { ...newNPC, speed: npc.width+1, fallbackSpeed: npc.speed };//TODO speed+1?
     } else if (npc.isNew && !npc.hasCollision) {
       newNPC = { ...newNPC, speed: newNPC.fallbackSpeed, isNew: false };
     }
@@ -43,7 +43,7 @@ export class Characters {
 
       if (newNPC.type === 'vip' && !attack && (
           newNPC.x >= width*newNPC.maxRight ||
-          newNPC.y <= width*newNPC.maxLeft ||
+          newNPC.x <= width*newNPC.maxLeft ||
           newNPC.y >= height*newNPC.maxDown ||
           newNPC.y <= height*newNPC.maxUp)){
         newNPC = {
